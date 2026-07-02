@@ -1,0 +1,35 @@
+[
+  {
+    "id": "2026-07-02",
+    "date": "2026-07-02",
+    "title": "Demo Mini Cryptic",
+    "status": "Published",
+    "solutionRows": [
+      "TRAINER",
+      "A#TEA#O",
+      "PUZZLED",
+      "###I###",
+      "MEETING",
+      "E#NET#S",
+      "RESULTS"
+    ],
+    "clues": {
+      "1A": "Coach in carriage? (7)",
+      "4A": "Drink concealed in create again (3)",
+      "6A": "Confused by poser with led astray (7)",
+      "7A": "One learner's first? (1)",
+      "8A": "Gathering me, getting oddly trimmed (7)",
+      "10A": "Catch online? (3)",
+      "12A": "Outcomes from rules around set? (7)",
+      "1D": "At first, trainer asks puzzle entrants - a starter (3)",
+      "2D": "Regret start of routine, ultimately eerie (3)",
+      "3D": "Initially training employees? demo filler (3)",
+      "4D": "Tea centre lifted for example filler (3)",
+      "5D": "Office round, briefly (3)",
+      "8D": "Message endpoint starts many emails (3)",
+      "9D": "Everyone's training starts, oddly (3)",
+      "11D": "Net result starts, perhaps (3)"
+    }
+  }
+]
+`
