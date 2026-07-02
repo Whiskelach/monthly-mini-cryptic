@@ -334,6 +334,7 @@
     let elapsed = 0;
     let timerRunning = false;
     let timerInterval = null;
+    let timerStartedAt = null;
     let inputRefs = {};
 
     const app = document.getElementById("app");
@@ -359,33 +360,45 @@
     }
 
     function startTimer() {
-      if (timerRunning || submitted) return;
+  if (timerRunning || submitted) return;
 
-      timerRunning = true;
-      timerInterval = setInterval(() => {
-        elapsed += 1;
-        timer.textContent = formatTime(elapsed);
-      }, 1000);
-    }
+  timerRunning = true;
+  timerStartedAt = Date.now() - elapsed * 1000;
 
-    function stopTimer() {
-      timerRunning = false;
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-    }
+  timerInterval = setInterval(() => {
+    elapsed = Math.floor((Date.now() - timerStartedAt) / 1000);
+    timer.textContent = formatTime(elapsed);
+  }, 250);
+}
 
-    function resetPuzzleState() {
-      letters = {};
-      submitted = false;
-      score = null;
-      elapsed = 0;
-      timerRunning = false;
-      inputRefs = {};
-      stopTimer();
-      timer.textContent = "00:00";
-    }
+ function stopTimer() {
+  if (timerRunning && timerStartedAt !== null) {
+    elapsed = Math.floor((Date.now() - timerStartedAt) / 1000);
+    timer.textContent = formatTime(elapsed);
+  }
+
+  timerRunning = false;
+  timerStartedAt = null;
+
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+ function resetPuzzleState() {
+  stopTimer();
+
+  letters = {};
+  submitted = false;
+  score = null;
+  elapsed = 0;
+  timerRunning = false;
+  timerStartedAt = null;
+  inputRefs = {};
+
+  timer.textContent = "00:00";
+}
 
     function isOpen(solutionRows, r, c) {
       return (
@@ -771,8 +784,9 @@ editorHelper.style.display = "block";
           input.disabled = submitted;
           input.setAttribute("aria-label", `Row ${cell.r + 1}, column ${cell.c + 1}`);
 
-          input.addEventListener("input", (event) => handleInput(event, key));
-          input.addEventListener("keydown", (event) => handleKeyDown(event, key));
+         input.addEventListener("focus", startTimer);
+input.addEventListener("input", (event) => handleInput(event, key));
+input.addEventListener("keydown", (event) => handleKeyDown(event, key));
 
           inputRefs[key] = input;
           div.appendChild(input);
