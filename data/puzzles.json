@@ -1,60 +1,34 @@
 [
-  {
-    "id": "2026-07-02",
-    "date": "2026-07-02",
-    "title": "Demo Mini Cryptic",
-    "status": "Published",
-    "solutionRows": [
-      "TRAINER",
-      "A#TEA#O",
-      "PUZZLED",
-      "###I###",
-      "MEETING",
-      "E#NET#S",
-      "RESULTS"
-    ],
-    "clues": {
-      "1A": "Coach in carriage? (7)",
-      "4A": "Drink concealed in create again (3)",
-      "6A": "Confused by poser with led astray (7)",
-      "7A": "One learner's first? (1)",
-      "8A": "Gathering me, getting oddly trimmed (7)",
-      "10A": "Catch online? (3)",
-      "12A": "Outcomes from rules around set? (7)",
-      "1D": "At first, trainer asks puzzle entrants - a starter (3)",
-      "2D": "Regret start of routine, ultimately eerie (3)",
-      "3D": "Initially training employees? demo filler (3)",
-      "4D": "Tea centre lifted for example filler (3)",
-      "5D": "Office round, briefly (3)",
-      "8D": "Message endpoint starts many emails (3)",
-      "9D": "Everyone's training starts, oddly (3)",
-      "11D": "Net result starts, perhaps (3)"
-    }
-  },
-  {
-    "id": "2026-07-03",
-    "date": "2026-07-03",
-    "title": "Friday Quickie",
-    "status": "Published",
-    "solutionRows": [
-      "HI#A#OK",
-      "A#SUN#R",
-      "ORANGES",
-      "#EMAIL#",
-      "TRAINER",
-      "S#TEA#S",
-      "GO#D#UP"
-    ],
-    "clues": {
-      "1A": "Greeting heard in high spirits (2)",
-      "3A": "Fine knock-out without n? (2)",
-      "4A": "Star seen in Sunday initially (3)",
-      "6A": "Fruit or anger's cooked (7)",
-      "7A": "Message male I rearranged (5)",
-      "8A": "Coach, one in train perhaps (7)",
-      "10A": "Break drink hidden in great afternoon (3)",
-      "12A": "Try leaving ego empty? (2)",
-      "13A": "Awake, or north on map (2)"
-    }
+{
+  "id": "2026-07-01-bedtime-raiders",
+  "date": "2026-07-01",
+  "title": "Bedtime Raiders",
+  "status": "Published",
+  "solutionRows": [
+    "FLATBED",
+    "O#IRE#O",
+    "PIRATES",
+    "###I###",
+    "EVENING",
+    "L#RED#A",
+    "FORESTS"
+  ],
+  "clues": {
+    "1A": "Level support for sleeper makes truck (7)",
+    "6A": "Anger found in fIRE (3)",
+    "7A": "Raiders prise at sea (7)",
+    "8A": "Nightfall, or levelling out (7)",
+    "12A": "Colour hidden in boREDom (3)",
+    "13A": "Woods for rests, strangely (7)",
+    "1D": "Dandy first found on parade (3)",
+    "2D": "Tune broadcast (3)",
+    "3D": "Learner getting training, initially, with employee ending (7)",
+    "4D": "Wager hidden in alphaBET (3)",
+    "5D": "Old operating system does, briefly (3)",
+    "8D": "Small helper found in shELF (3)",
+    "9D": "Make a mistake, endlessly embarrassed? (3)",
+    "10D": "Freudian selves hidden in solID Stone (3)",
+    "11D": "Fuel, or idle talk (3)"
   }
+}
 ]
