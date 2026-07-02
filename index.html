@@ -343,6 +343,7 @@
     const puzzleSelect = document.getElementById("puzzle-select");
     const timer = document.getElementById("timer");
     const editorHelper = document.getElementById("editor-helper");
+    const isAdminMode = new URLSearchParams(window.location.search).get("admin") === "true";
 
     function getLocalTodayIso() {
       const now = new Date();
@@ -608,6 +609,14 @@
       navigator.clipboard.writeText(message);
     }
 function renderEditorHelper(entries) {
+  if (!isAdminMode) {
+  editorHelper.innerHTML = "";
+  editorHelper.style.display = "none";
+  return;
+}
+
+editorHelper.style.display = "block";
+  
   const across = entries.filter((entry) => entry.direction === "A");
   const down = entries.filter((entry) => entry.direction === "D");
 
