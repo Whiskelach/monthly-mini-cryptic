@@ -342,6 +342,7 @@
     const puzzleSubtitle = document.getElementById("puzzle-subtitle");
     const puzzleSelect = document.getElementById("puzzle-select");
     const timer = document.getElementById("timer");
+    const editorHelper = document.getElementById("editor-helper");
 
     function getLocalTodayIso() {
       const now = new Date();
@@ -606,7 +607,48 @@
 
       navigator.clipboard.writeText(message);
     }
+function renderEditorHelper(entries) {
+  const across = entries.filter((entry) => entry.direction === "A");
+  const down = entries.filter((entry) => entry.direction === "D");
 
+  function makeHelperList(list) {
+    return list.map((entry) => {
+      const clueExists = currentPuzzle.clues && currentPuzzle.clues[entry.id];
+      const missingText = clueExists ? "" : " <span class=\"missing-clue\">Missing clue</span>";
+
+      return `
+        <li>
+          <strong>${entry.id}:</strong> ${entry.answer} (${entry.answer.length})
+          ${missingText}
+        </li>
+      `;
+    }).join("");
+  }
+
+  editorHelper.innerHTML = `
+    <h2>Puzzle editor helper</h2>
+    <p>
+      This section shows the clue IDs and answers generated from the current grid.
+      Use these IDs when editing <code>data/puzzles.json</code>.
+    </p>
+
+    <div class="helper-grid">
+      <div>
+        <h3>Across</h3>
+        <ol class="helper-list">
+          ${makeHelperList(across)}
+        </ol>
+      </div>
+
+      <div>
+        <h3>Down</h3>
+        <ol class="helper-list">
+          ${makeHelperList(down)}
+        </ol>
+      </div>
+    </div>
+  `;
+}
     function render() {
       if (!currentPuzzle) {
         app.innerHTML = `
@@ -632,6 +674,8 @@
       const cells = getCells(currentPuzzle.solutionRows);
       const across = entries.filter((entry) => entry.direction === "A");
       const down = entries.filter((entry) => entry.direction === "D");
+
+      renderEditorHelper(entries);
 
       puzzleTitle.textContent = currentPuzzle.title;
       puzzleSubtitle.textContent =
