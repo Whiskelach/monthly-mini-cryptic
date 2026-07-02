@@ -114,17 +114,17 @@
       grid-template-columns: repeat(7, 1fr);
       width: 100%;
       max-width: 420px;
-      border-top: 2px solid var(--black);
-      border-left: 2px solid var(--black);
+     background: var(--black);
+  border: 2px solid var(--black);
+  gap: 2px;
+
     }
 
-    .cell {
-      position: relative;
-      aspect-ratio: 1 / 1;
-      border-right: 2px solid var(--black);
-      border-bottom: 2px solid var(--black);
-      background: var(--white);
-    }
+   .cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--white);
+}
 
     .cell.block {
       background: var(--black);
@@ -281,23 +281,27 @@
   }
 }
 
-    @media (max-width: 820px) {
-      .layout {
-        display: block;
-      }
+   @media (max-width: 820px) {
+  .layout {
+    display: block;
+  }
 
-      .grid {
-        margin-bottom: 22px;
-      }
+  .layout > div:first-child {
+    margin-bottom: 36px;
+  }
 
-      .clues {
-        grid-template-columns: 1fr;
-      }
+  .grid {
+    margin-bottom: 16px;
+  }
 
-      .controls {
-        width: 100%;
-      }
-    }
+  .clues {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    width: 100%;
+  }
+}
   </style>
 </head>
 
