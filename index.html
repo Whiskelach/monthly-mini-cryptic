@@ -363,6 +363,27 @@
       return `${minutes}:${seconds}`;
     }
 
+    function formatMonthYear(dateString) {
+  const date = new Date(`${dateString}T00:00:00`);
+  return date.toLocaleDateString("en-NZ", {
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function formatMonthlyTitle(dateString) {
+  const date = new Date(`${dateString}T00:00:00`);
+  const month = date.toLocaleDateString("en-NZ", {
+    month: "long"
+  });
+
+  return `${month}'s Mini Cryptic`;
+}
+
+function getMonthKey(dateString) {
+  return dateString.slice(0, 7);
+}
+
     function startTimer() {
   if (timerRunning || submitted) return;
 
@@ -519,14 +540,17 @@
     }
 
     function chooseDefaultPuzzle(publishedPuzzles) {
-      const today = getLocalTodayIso();
+  const currentMonth = getMonthKey(getLocalTodayIso());
 
-      const todaysPuzzle = publishedPuzzles.find((puzzle) => puzzle.date === today);
-      if (todaysPuzzle) return todaysPuzzle;
+  const thisMonthsPuzzle = publishedPuzzles.find((puzzle) => {
+    return getMonthKey(puzzle.date) === currentMonth;
+  });
 
-      const sorted = [...publishedPuzzles].sort((a, b) => b.date.localeCompare(a.date));
-      return sorted[0];
-    }
+  if (thisMonthsPuzzle) return thisMonthsPuzzle;
+
+  const sorted = [...publishedPuzzles].sort((a, b) => b.date.localeCompare(a.date));
+  return sorted[0];
+}
 
     function setCurrentPuzzle(puzzleId) {
       const selected = puzzles.find((puzzle) => puzzle.id === puzzleId);
@@ -702,10 +726,9 @@ editorHelper.style.display = "block";
 
       renderEditorHelper(entries);
 
-      puzzleTitle.textContent = currentPuzzle.title;
+    puzzleTitle.textContent = formatMonthlyTitle(currentPuzzle.date);
       puzzleSubtitle.textContent =
-        `${currentPuzzle.date} · Enter your answers, then submit for a percentage score.`;
-
+  `${formatMonthYear(currentPuzzle.date)} · Enter your answers, then submit for a percentage score.`;
       puzzleSelect.value = currentPuzzle.id;
 
       app.innerHTML = `
@@ -823,8 +846,8 @@ input.addEventListener("keydown", (event) => handleKeyDown(event, key));
         }
 
         puzzleSelect.innerHTML = puzzles
-          .map((puzzle) => `<option value="${puzzle.id}">${puzzle.date}</option>`)
-          .join("");
+  .map((puzzle) => `<option value="${puzzle.id}">${formatMonthYear(puzzle.date)}</option>`)
+  .join("");
 
         puzzleSelect.addEventListener("change", (event) => {
           setCurrentPuzzle(event.target.value);
