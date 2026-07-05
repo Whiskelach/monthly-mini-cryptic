@@ -639,15 +639,18 @@ function getMonthKey(dateString) {
     }
 
     function copyResult() {
-      if (!score) return;
+  if (!score) return;
 
-      const message =
-        `Daily Mini Cryptic — ${currentPuzzle.date}\n` +
-        `Score: ${score.percent}% (${score.correct}/${score.total})\n` +
-        `Time: ${formatTime(elapsed)}`;
+  const monthLabel = formatMonthYear(currentPuzzle.date);
 
-      navigator.clipboard.writeText(message);
-    }
+  const message =
+    `Monthly Mini Cryptic — ${monthLabel}\n` +
+    `Score: ${score.percent}% (${score.correct}/${score.total})\n` +
+    `Time: ${formatTime(elapsed)}`;
+
+  navigator.clipboard.writeText(message);
+}
+    
 function renderEditorHelper(entries) {
   if (!isAdminMode) {
   editorHelper.innerHTML = "";
