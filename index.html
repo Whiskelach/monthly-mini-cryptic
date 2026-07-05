@@ -639,18 +639,15 @@ function getMonthKey(dateString) {
     }
 
     function copyResult() {
-  if (!score) return;
+      if (!score) return;
 
-  const monthLabel = formatMonthYear(currentPuzzle.date);
+      const message =
+        `Daily Mini Cryptic — ${currentPuzzle.date}\n` +
+        `Score: ${score.percent}% (${score.correct}/${score.total})\n` +
+        `Time: ${formatTime(elapsed)}`;
 
-  const message =
-    `Monthly Mini Cryptic — ${monthLabel}\n` +
-    `Score: ${score.percent}% (${score.correct}/${score.total})\n` +
-    `Time: ${formatTime(elapsed)}`;
-
-  navigator.clipboard.writeText(message);
-}
-    
+      navigator.clipboard.writeText(message);
+    }
 function renderEditorHelper(entries) {
   if (!isAdminMode) {
   editorHelper.innerHTML = "";
@@ -859,7 +856,7 @@ input.addEventListener("keydown", (event) => handleKeyDown(event, key));
         currentPuzzle = chooseDefaultPuzzle(puzzles);
         render();
       } catch (error) {
-        puzzleTitle.textContent = "Monthly Mini Cryptic";
+        puzzleTitle.textContent = "Daily Mini Cryptic";
         puzzleSubtitle.textContent = "There was a problem loading the puzzle data.";
 
         app.innerHTML = `
