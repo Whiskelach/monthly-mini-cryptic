@@ -642,7 +642,7 @@ function getMonthKey(dateString) {
       if (!score) return;
 
       const message =
-        `Daily Mini Cryptic — ${currentPuzzle.date}\n` +
+        `Monthly Mini Cryptic — ${currentPuzzle.date}\n` +
         `Score: ${score.percent}% (${score.correct}/${score.total})\n` +
         `Time: ${formatTime(elapsed)}`;
 
@@ -856,7 +856,7 @@ input.addEventListener("keydown", (event) => handleKeyDown(event, key));
         currentPuzzle = chooseDefaultPuzzle(puzzles);
         render();
       } catch (error) {
-        puzzleTitle.textContent = "Daily Mini Cryptic";
+        puzzleTitle.textContent = "Monthly Mini Cryptic";
         puzzleSubtitle.textContent = "There was a problem loading the puzzle data.";
 
         app.innerHTML = `
