@@ -110,42 +110,83 @@
     }
 
     .grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      width: 100%;
-      max-width: 420px;
-     background: var(--black);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: 100%;
+  max-width: 420px;
+  background: var(--black);
   border: 2px solid var(--black);
   gap: 2px;
+  overflow: visible;
+}
 
-    }
-
-   .cell {
+  .cell {
   position: relative;
   aspect-ratio: 1 / 1;
   background: var(--white);
+  overflow: visible;
 }
 
     .cell.block {
       background: var(--black);
     }
 
-    .cell.correct {
-  background: var(--pale-green);
+.cell.correct,
+.cell.incorrect {
+  background: var(--white);
 }
 
-    .cell.incorrect {
-      background: var(--pale-red);
-    }
+    .cell.active-entry {
+  background: #f1cfd6;
+}
+
+.cell.selected-cell {
+  position: relative;
+  z-index: 10;
+}
+
+.cell.selected-cell::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 3px solid var(--red);
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.clue-list li {
+  padding: 4px 8px;
+}
+
+.clue-list li.active-clue {
+  background: #f1cfd6;
+  box-shadow: inset -4px 0 0 var(--red);
+}
+
+.clue-button {
+  all: unset;
+  cursor: pointer;
+}
+
+.clue-button:hover {
+  color: var(--red);
+}
+
+.clue-button:focus {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
 
     .number {
-      position: absolute;
-      top: 2px;
-      left: 3px;
-      font: 700 10px Arial, sans-serif;
-      line-height: 1;
-      z-index: 1;
-    }
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  font: 700 10px Arial, sans-serif;
+  line-height: 1;
+  z-index: 20;
+  background: transparent;
+}
 
     .cell input {
       width: 100%;
@@ -164,10 +205,16 @@
   opacity: 1;
   -webkit-text-fill-color: var(--black);
 }
+    .cell input.revealed-incorrect,
+.cell input.revealed-incorrect:disabled {
+  color: var(--red);
+  opacity: 1;
+  -webkit-text-fill-color: var(--red);
+}
 
     .cell input:focus {
-      box-shadow: inset 0 0 0 1px var(--black);
-    }
+  box-shadow: none;
+}
 
     .actions {
       max-width: 420px;
@@ -344,6 +391,9 @@
     let timerRunning = false;
     let timerInterval = null;
     let timerStartedAt = null;
+    let activeEntryId = null;
+    let activeDirection = "A";
+    let selectedCellKey = null;
     let inputRefs = {};
 
     const app = document.getElementById("app");
@@ -425,6 +475,9 @@ function getMonthKey(dateString) {
   elapsed = 0;
   timerRunning = false;
   timerStartedAt = null;
+  activeEntryId = null;
+  activeDirection = "A";
+  selectedCellKey = null;
   inputRefs = {};
 
   timer.textContent = "00:00";
@@ -566,53 +619,101 @@ function getMonthKey(dateString) {
       render();
     }
 
-    function moveFocus(currentKey, direction) {
-      const cells = getCells(currentPuzzle.solutionRows).filter((cell) => cell.solution !== "#");
-      const currentIndex = cells.findIndex((cell) => `${cell.r}-${cell.c}` === currentKey);
-      const next = cells[currentIndex + direction];
+ function getActiveEntry() {
+  const { entries } = analyseGrid(currentPuzzle.solutionRows);
+  return entries.find((entry) => entry.id === activeEntryId);
+}
 
-      if (next) {
-        const nextKey = `${next.r}-${next.c}`;
-        if (inputRefs[nextKey]) inputRefs[nextKey].focus();
+function moveFocus(currentKey, direction) {
+  const activeEntry = getActiveEntry();
+
+  let cellKeys = [];
+
+  if (activeEntry && activeEntry.cells.includes(currentKey)) {
+    cellKeys = activeEntry.cells;
+  } else {
+    cellKeys = getCells(currentPuzzle.solutionRows)
+      .filter((cell) => cell.solution !== "#")
+      .map((cell) => `${cell.r}-${cell.c}`);
+  }
+
+  const currentIndex = cellKeys.indexOf(currentKey);
+  const nextKey = cellKeys[currentIndex + direction];
+
+  if (nextKey) {
+    selectedCellKey = nextKey;
+    render();
+
+    setTimeout(() => {
+      if (inputRefs[nextKey]) {
+        inputRefs[nextKey].focus();
       }
-    }
+    }, 0);
+  }
+}
 
     function handleInput(event, key) {
-      if (submitted) return;
+  if (submitted) return;
 
-      startTimer();
+  startTimer();
 
-      const value = event.target.value
-        .toUpperCase()
-        .replace(/[^A-Z]/g, "")
-        .slice(-1);
+  selectedCellKey = key;
 
-      letters[key] = value;
-      event.target.value = value;
+  const value = event.target.value
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "")
+    .slice(-1);
 
-      if (value) {
-        moveFocus(key, 1);
-      }
+  letters[key] = value;
+  event.target.value = value;
+
+  if (value) {
+    moveFocus(key, 1);
+  }
+}
+
+ function handleKeyDown(event, key) {
+  if (submitted) return;
+
+  selectedCellKey = key;
+
+  if (event.key === "Tab") {
+    event.preventDefault();
+    selectNextEntry(event.shiftKey ? -1 : 1);
+    return;
+  }
+
+  if (/^[a-zA-Z]$/.test(event.key)) {
+    event.preventDefault();
+    startTimer();
+
+    letters[key] = event.key.toUpperCase();
+
+    if (event.target) {
+      event.target.value = letters[key];
     }
 
-    function handleKeyDown(event, key) {
-      if (submitted) return;
+    moveFocus(key, 1);
+    return;
+  }
 
-      if (event.key === "Backspace" && !letters[key]) {
-        event.preventDefault();
-        moveFocus(key, -1);
-      }
+  if (event.key === "Backspace" && !letters[key]) {
+    event.preventDefault();
+    moveFocus(key, -1);
+    return;
+  }
 
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        moveFocus(key, 1);
-      }
+  if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+    event.preventDefault();
+    moveFocus(key, 1);
+    return;
+  }
 
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        moveFocus(key, -1);
-      }
-    }
+  if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+    event.preventDefault();
+    moveFocus(key, -1);
+  }
+}
 
     function submitPuzzle() {
       const cells = getCells(currentPuzzle.solutionRows);
@@ -653,6 +754,68 @@ function getMonthKey(dateString) {
 
       navigator.clipboard.writeText(message);
     }
+
+    function selectEntry(entryId, preferredCellKey = null) {
+  const { entries } = analyseGrid(currentPuzzle.solutionRows);
+  const entry = entries.find((item) => item.id === entryId);
+
+  if (!entry) return;
+
+  activeEntryId = entryId;
+  activeDirection = entry.direction;
+  selectedCellKey = preferredCellKey || entry.cells[0];
+
+  render();
+
+  if (selectedCellKey && inputRefs[selectedCellKey]) {
+    inputRefs[selectedCellKey].focus();
+  }
+}
+ function selectCell(cellKey, entries) {
+  if (submitted) return;
+
+  const matchingEntries = entries.filter((entry) => entry.cells.includes(cellKey));
+
+  if (matchingEntries.length === 0) return;
+
+  const acrossEntry = matchingEntries.find((entry) => entry.direction === "A");
+  const downEntry = matchingEntries.find((entry) => entry.direction === "D");
+
+  let nextEntry = null;
+
+  const clickedSameCell = selectedCellKey === cellKey;
+  const currentEntryIsAvailable = matchingEntries.some((entry) => entry.id === activeEntryId);
+
+  if (clickedSameCell && currentEntryIsAvailable && acrossEntry && downEntry) {
+    nextEntry = activeDirection === "A" ? downEntry : acrossEntry;
+  } else {
+    nextEntry = acrossEntry || downEntry || matchingEntries[0];
+  }
+
+  selectEntry(nextEntry.id, cellKey);
+}   
+    function selectNextEntry(direction = 1) {
+  if (!currentPuzzle) return;
+
+  const { entries } = analyseGrid(currentPuzzle.solutionRows);
+  const across = entries.filter((entry) => entry.direction === "A");
+  const down = entries.filter((entry) => entry.direction === "D");
+  const orderedEntries = [...across, ...down];
+
+  if (orderedEntries.length === 0) return;
+
+  let currentIndex = orderedEntries.findIndex((entry) => entry.id === activeEntryId);
+
+  if (currentIndex === -1) {
+    currentIndex = direction === 1 ? -1 : 0;
+  }
+
+  const nextIndex =
+    (currentIndex + direction + orderedEntries.length) % orderedEntries.length;
+
+  selectEntry(orderedEntries[nextIndex].id);
+}
+    
 function renderEditorHelper(entries) {
   if (!isAdminMode) {
   editorHelper.innerHTML = "";
@@ -729,6 +892,13 @@ editorHelper.style.display = "block";
       const across = entries.filter((entry) => entry.direction === "A");
       const down = entries.filter((entry) => entry.direction === "D");
 
+      if (activeEntryId && !entries.some((entry) => entry.id === activeEntryId)) {
+  activeEntryId = null;
+}
+
+const activeEntry = entries.find((entry) => entry.id === activeEntryId);
+const activeCells = activeEntry ? activeEntry.cells : [];
+
       renderEditorHelper(entries);
 
     puzzleTitle.textContent = formatMonthlyTitle(currentPuzzle.date);
@@ -742,10 +912,10 @@ editorHelper.style.display = "block";
             <div class="grid" id="grid"></div>
 
             <div class="actions">
-              <button class="primary" id="submit-button" ${submitted ? "disabled" : ""}>Submit</button>
-              <button id="reset-button">Reset</button>
-              <button id="copy-button" ${score ? "" : "disabled"}>Copy result</button>
-            </div>
+  <button class="primary" id="submit-button" ${submitted ? "disabled" : ""}>Submit</button>
+  <button id="reset-button">Reset</button>
+  ${score ? `<button id="copy-button">Copy result</button>` : ""}
+</div>
 
             ${score ? `
               <div class="score-box">
@@ -759,24 +929,28 @@ editorHelper.style.display = "block";
             <section class="clue-section">
               <h2>Across</h2>
               <ol class="clue-list">
-                ${across.map((entry) => `
-                  <li>
-                    <strong>${entry.number}.</strong>
-                    ${currentPuzzle.clues[entry.id] || `<em>Missing clue for ${entry.id}</em>`}
-                  </li>
-                `).join("")}
+               ${across.map((entry) => `
+  <li class="${activeEntryId === entry.id ? "active-clue" : ""}">
+    <button type="button" class="clue-button" data-entry-id="${entry.id}">
+      <strong>${entry.number}.</strong>
+      ${currentPuzzle.clues[entry.id] || `<em>Missing clue for ${entry.id}</em>`}
+    </button>
+  </li>
+`).join("")}
               </ol>
             </section>
 
             <section class="clue-section">
               <h2>Down</h2>
               <ol class="clue-list">
-                ${down.map((entry) => `
-                  <li>
-                    <strong>${entry.number}.</strong>
-                    ${currentPuzzle.clues[entry.id] || `<em>Missing clue for ${entry.id}</em>`}
-                  </li>
-                `).join("")}
+           ${down.map((entry) => `
+  <li class="${activeEntryId === entry.id ? "active-clue" : ""}">
+    <button type="button" class="clue-button" data-entry-id="${entry.id}">
+      <strong>${entry.number}.</strong>
+      ${currentPuzzle.clues[entry.id] || `<em>Missing clue for ${entry.id}</em>`}
+    </button>
+  </li>
+`).join("")}
               </ol>
             </section>
           </div>
@@ -804,6 +978,12 @@ editorHelper.style.display = "block";
         } else if (submitted && entered !== cell.solution) {
           div.classList.add("incorrect");
         }
+        if (!isBlock && !submitted && activeCells.includes(key)) {
+  div.classList.add("active-entry");
+}
+        if (!isBlock && !submitted && selectedCellKey === key) {
+  div.classList.add("selected-cell");
+}
 
         if (!isBlock && numbers[key]) {
           const number = document.createElement("span");
@@ -813,11 +993,20 @@ editorHelper.style.display = "block";
         }
 
         if (!isBlock) {
+  div.addEventListener("click", () => {
+    selectCell(key, entries);
+  });
+}
+
+        if (!isBlock) {
           const input = document.createElement("input");
           input.maxLength = 1;
           input.value = displayValue;
           input.disabled = submitted;
           input.setAttribute("aria-label", `Row ${cell.r + 1}, column ${cell.c + 1}`);
+          if (submitted && entered !== cell.solution) {
+  input.classList.add("revealed-incorrect");
+}
 
          input.addEventListener("focus", startTimer);
 input.addEventListener("input", (event) => handleInput(event, key));
@@ -831,8 +1020,18 @@ input.addEventListener("keydown", (event) => handleKeyDown(event, key));
       });
 
       document.getElementById("submit-button").addEventListener("click", submitPuzzle);
-      document.getElementById("reset-button").addEventListener("click", resetPuzzle);
-      document.getElementById("copy-button").addEventListener("click", copyResult);
+document.getElementById("reset-button").addEventListener("click", resetPuzzle);
+
+const copyButton = document.getElementById("copy-button");
+if (copyButton) {
+  copyButton.addEventListener("click", copyResult);
+}
+document.querySelectorAll("[data-entry-id]").forEach((button) => {
+  button.addEventListener("click", () => {
+    selectEntry(button.dataset.entryId);
+  });
+});
+      
     }
 
     async function loadPuzzles() {
